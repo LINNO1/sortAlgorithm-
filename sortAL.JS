@@ -9,8 +9,8 @@ function swap(arr,i,j){
 	arr[j]=t;
 }
 
-/*--------------------------------------------------------------------------------------------
-/*---------------------插入排序：稳定 比较 --------------------*/
+/*------------------------插入排序-------------------------------------*/
+/*---------------------插入排序：稳定 比较  O(N^2)  O(1)--------------------*/
 var arr=[5,6,3,1,8,11,23,1,2]
 function insertSort(arr){
     console.log('------insertSort---------')
@@ -36,7 +36,7 @@ function shellSort(arr){
 	var half = parseInt(arr.length/2); 
 	console.log('------shellSort---------')
 	for(let d=half;d>=1;d=parseInt(d/2) ){//计算每次插入排序的步长
-		//以下为 步长为d 的插入排序
+		//以下为 步长为d 的插入排序 
 		for(let i=d;i<arr.length;i++){
 			var cur=arr[i];
 			for(let j=i-d;j>=0;j-=d){
@@ -82,6 +82,7 @@ function heapSort(arr){
 	var len = arr.length;
 	console.log('------heapSort---------')
 	//构建二叉堆
+	/*思路*/
 	var sift = function(out, k, m){
 		let i = k, j = 2*k+1; //j为左孩子的下标，j+1为右孩子
 		while(j <= m && j!=len){  //如果该节点有子节点(即判断左孩子的坐标是否小于数组的长度)
@@ -101,19 +102,25 @@ function heapSort(arr){
 		}
 	}
 	let half = parseInt(len/2);
-	//初始建堆
-	//从arr.length-1 开始 到 0,都有子节点
+
+	//1. 初始建堆
+    /* 构建最大二叉堆思路： 从非叶子节点(从arr.length-1 开始 到 0,都有子节点)起，比较其与孩子节点的值，最大的作为为父子节点*/
+	
 	for(let i=half-1;i>=0;i--){
 		sift(arr, i, len);
 		console.log('建堆完毕')
 		console.log(arr);
 	}
+
+
+
+    //2. 建堆之后，根节点的值最大，然后交换根节点与最后一个节点的位置 3. 从0-len-2 重新建堆
 	for(let i=0;i<len-1;i++){
 		//交换第一个和最后一个(len-i)的位置
 		swap(arr,0,len-1-i)
 		console.log(arr);
 		//最后一个站定，其余的继续构建二叉堆,从0开始
-		sift(arr, 0, len-1-i-1);//****************只要一次就可
+		sift(arr, 0, len-1-i-1);//****************只要一次就可，***************
 	}
 	return arr;
 }
@@ -348,19 +355,20 @@ function partition(arr, left ,right) {     // 分区操作
         if (arr[i] < arr[pivot]) {
             swap(arr, i, index); //交换
             index++;  
-            /*注意： 3 5 1 4 2
-                 1： 3 5 1 4 2
-                 2； 3 1 5 4 2
-                     3 1 5 4 2
-                     3 1 2 4 5
-             循环结束后：2 1 3 4 5 (交换 pivot 和 index-1)
+            /*注意： 3 2 5 1 4 2 6
+                 1： 3 2 5 1 4 2 6
+                 2； 3 2 5 1 4 2 6
+                 3： 3 2 1 5 4 2 6    
+                 4： 3 2 1 5 4 2 6
+                 5： 3 2 1 2 4 5 6
+             循环结束后：2 2 1 3 4 5 6 (交换 pivot 和 index-1)
 
             */
         }       
     }
-    swap(arr, pivot, index - 1);
+    swap(arr, pivot, index - 1);  
     console.log(arr);
-    return index-1;
+    return index-1;  /*返回基准值下标*/
 }
 /*function quickSort(arr){
 	console.log('---quickSort----')
@@ -393,3 +401,73 @@ function partition(arr, left ,right) {     // 分区操作
 	return quick(arr,0,arr.length-1);
 
 }*/
+
+/*------------------------------二叉树排序------------------*/
+function binaryTreeSort(arr){
+	console.log('二叉树排序')
+    var root=null;
+  /*建立排序二叉树*/
+    arr.forEach(function(ele){
+    	creatTree(ele);
+    })
+ /*中序遍历二叉树*/
+   inorderTrave(root);
+   inorderTraveRecur(root);
+
+
+
+	function createNode(val){
+        this.val=val;
+        this.left=null;
+        this.right=null;
+	}
+	function creatTree(val){
+       var newNode=new createNode(val);
+       if(root===null){ root=newNode; return;}
+       creatTreeNode(root,newNode);
+	}
+   function creatTreeNode(node,newNode){
+     if(newNode.val<node.val){
+     	 if(node.left===null){
+     	 	node.left=newNode;
+     	 }else{
+     	 	creatTreeNode(node.left,newNode)
+     	 }
+     }else{
+     	 if(node.right===null){
+     	 	node.right=newNode;
+     	 }else{
+     	 	creatTreeNode(node.right,newNode)
+     	 }
+    }
+  }
+
+  function inorderTraveRecur(node){
+  	
+  	if(node!=null){
+     inorderTrave(node.left);
+     console.log(node.val);
+     inorderTrave(node.right)
+   }
+ }
+
+ function inorderTrave(node){
+ 	console.log('非递归')
+ 	var stack=[];
+ 	var valArr=[];
+ 	while(node!=null || stack.length!=0){
+ 		while(node!=null){
+ 			stack.push(node);
+ 			node=node.left;
+ 		}
+ 		if(stack.length!=0){
+ 			node=stack.pop();
+ 			console.log(node.val);
+ 			node=node.right;
+ 		} 	 
+   }
+ }
+}
+
+var xxx=[21,23,1,32,45,2,65,755,15,24,22];
+binaryTreeSort(xxx)
